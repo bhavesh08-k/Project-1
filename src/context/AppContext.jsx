@@ -25,6 +25,12 @@ export function AppProvider({ children }) {
   const [user, setUser] = useState(getStoredUser())
   const [searchQuery, setSearchQuery] = useState('')
   const [draft, setDraftState] = useState(getDraft() || emptyDraft)
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [reviewsVersion, setReviewsVersion] = useState(0)
+
+  const triggerReviewsRefresh = () => {
+    setReviewsVersion((v) => v + 1)
+  }
 
   const setCity = (next) => {
     setCityState(next)
@@ -66,8 +72,12 @@ export function AppProvider({ children }) {
       draft,
       updateDraft,
       resetDraft,
+      loginModalOpen,
+      setLoginModalOpen,
+      reviewsVersion,
+      triggerReviewsRefresh,
     }),
-    [city, user, searchQuery, draft],
+    [city, user, searchQuery, draft, loginModalOpen, reviewsVersion],
   )
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

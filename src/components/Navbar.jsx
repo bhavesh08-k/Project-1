@@ -6,9 +6,14 @@ import Button from './Button'
 import LoginModal from './LoginModal'
 
 export default function Navbar() {
-  const { city, setCity, user, logout, searchQuery, setSearchQuery } = useApp()
+  const { city, setCity, user, logout, searchQuery, setSearchQuery, loginModalOpen, setLoginModalOpen } = useApp()
   const [open, setOpen] = useState(false)
-  const [loginOpen, setLoginOpen] = useState(false)
+  const [localLoginOpen, setLocalLoginOpen] = useState(false)
+  const isLoginOpen = localLoginOpen || loginModalOpen
+  const closeLogin = () => {
+    setLocalLoginOpen(false)
+    if (setLoginModalOpen) setLoginModalOpen(false)
+  }
   const navigate = useNavigate()
 
   const submitSearch = (event) => {
@@ -57,7 +62,7 @@ export default function Navbar() {
               {user.name.split(' ')[0]}
             </Button>
           ) : (
-            <Button variant="ghost" onClick={() => setLoginOpen(true)}>
+            <Button variant="ghost" onClick={() => setLocalLoginOpen(true)}>
               Login
             </Button>
           )}
@@ -95,10 +100,10 @@ export default function Navbar() {
             Sign out
           </Button>
         ) : (
-          <Button onClick={() => setLoginOpen(true)}>Login</Button>
+          <Button onClick={() => setLocalLoginOpen(true)}>Login</Button>
         )}
       </div>
-      {loginOpen ? <LoginModal onClose={() => setLoginOpen(false)} /> : null}
+      {isLoginOpen ? <LoginModal onClose={closeLogin} /> : null}
     </header>
   )
 }
