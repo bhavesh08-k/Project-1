@@ -287,6 +287,16 @@ select {
   background-position: center;
   transform: scale(1.04);
   filter: saturate(0.9);
+  animation: hero-fade 0.7s ease;
+}
+
+@keyframes hero-fade {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .hero-bg::after {
@@ -302,6 +312,59 @@ select {
   z-index: 1;
   padding: 80px 0 56px;
   max-width: 640px;
+}
+
+.hero-controls {
+  position: absolute;
+  z-index: 2;
+  right: max(20px, calc((100% - 1180px) / 2));
+  bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hero-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-arrow,
+.hero-dot {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  color: var(--ivory);
+  background: rgba(9, 8, 7, 0.72);
+  cursor: pointer;
+}
+
+.hero-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.hero-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.hero-dot.active {
+  width: 22px;
+  border-color: var(--gold);
+  background: var(--gold);
+}
+
+.hero-arrow:focus-visible,
+.hero-dot:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
 }
 
 .kicker {

@@ -1,16 +1,31 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import MovieGrid from '../components/MovieGrid'
 import { useApp } from '../context/AppContext'
 import { locations } from '../data/locations'
-import { getComingSoon, getFeatured, getNowShowing, getPopular } from '../data/movies'
+import { getComingSoon, getNowShowing, getPopular } from '../data/movies'
 import { formatDuration } from '../utils/bookingUtils'
 
 export default function Home() {
   const { city, setCity, searchQuery, setSearchQuery } = useApp()
-  const featured = getFeatured()
   const now = getNowShowing()
   const soon = getComingSoon()
   const popular = getPopular()
+  const featuredMovies = now.slice(0, 5)
+  const [activeSlide, setActiveSlide] = useState(0)
+  const featured = featuredMovies[activeSlide]
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % featuredMovies.length)
+    }, 6000)
+
+    return () => window.clearInterval(interval)
+  }, [featuredMovies.length])
+
+  function showSlide(index) {
+    setActiveSlide((index + featuredMovies.length) % featuredMovies.length)
+  }
 
   const filteredNow = searchQuery
     ? now.filter((m) => m.title.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -18,21 +33,25 @@ export default function Home() {
 
   return (
     <div>
-      <section className="hero">
-        <div className="hero-bg" style={{ backgroundImage: `url(${featured.backdrop})` }} />
+      <section className="hero" aria-label="Featured movies">
+        <div
+          key={featured.id}
+          className="hero-bg"
+          style={{ backgroundImage: `url(${featured.backdrop})` }}
+        />
         <div className="container hero-content">
           <p className="kicker">Now showing in {locations.find((l) => l.id === city)?.name}</p>
           <h1>{featured.title}</h1>
           <p className="muted">{featured.tagline}</p>
           <div className="chip-row">
-            <span className="chip">★ {featured.rating}</span>
+            {featured.rating > 0 && <span className="chip">★ {featured.rating}</span>}
             {featured.genres.map((g) => (
               <span className="chip" key={g}>
                 {g}
               </span>
             ))}
             <span className="chip">{featured.language}</span>
-            <span className="chip">{formatDuration(featured.duration)}</span>
+            {featured.duration && <span className="chip">{formatDuration(featured.duration)}</span>}
           </div>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Link to={`/movies/${featured.id}/showtimes`} className="btn btn-primary">
@@ -42,6 +61,36 @@ export default function Home() {
               View details
             </Link>
           </div>
+        </div>
+        <div className="hero-controls" aria-label="Featured movie slides">
+          <button
+            className="hero-arrow"
+            type="button"
+            onClick={() => showSlide(activeSlide - 1)}
+            aria-label="Previous movie"
+          >
+            ‹
+          </button>
+          <div className="hero-dots">
+            {featuredMovies.map((movie, index) => (
+              <button
+                key={movie.id}
+                className={`hero-dot${index === activeSlide ? ' active' : ''}`}
+                type="button"
+                onClick={() => showSlide(index)}
+                aria-label={`Show slide ${index + 1}: ${movie.title}`}
+                aria-current={index === activeSlide ? 'true' : undefined}
+              />
+            ))}
+          </div>
+          <button
+            className="hero-arrow"
+            type="button"
+            onClick={() => showSlide(activeSlide + 1)}
+            aria-label="Next movie"
+          >
+            ›
+          </button>
         </div>
       </section>
 
