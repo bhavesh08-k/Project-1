@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import Button from '../components/Button'
 import EmptyState from '../components/EmptyState'
 import MovieReviewsSection from '../components/Reviews/MovieReviewsSection'
-import TrailerModal from '../components/TrailerModal'
 import { useApp } from '../context/AppContext'
 import { getMovieById } from '../data/movies'
 import { getShowsForMovie } from '../data/shows'
@@ -15,7 +14,6 @@ export default function MovieDetails() {
   const { movieId } = useParams()
   const movie = getMovieById(movieId)
   const { city, updateDraft, reviewsVersion } = useApp()
-  const [trailer, setTrailer] = useState(false)
   const navigate = useNavigate()
 
   // Reviews for this movie
@@ -87,7 +85,7 @@ export default function MovieDetails() {
               </span>
             ))}
             <span className="chip">{movie.language}</span>
-            <span className="chip">{formatDuration(movie.duration)}</span>
+            {movie.duration ? <span className="chip">{formatDuration(movie.duration)}</span> : null}
             <span className="chip">{movie.certification}</span>
           </div>
 
@@ -107,7 +105,16 @@ export default function MovieDetails() {
           </div>
 
           <div style={{ display: 'flex', gap: 12, marginTop: 24, flexWrap: 'wrap' }}>
-            <Button onClick={() => setTrailer(true)}>Watch trailer</Button>
+            {movie.trailerUrl ? (
+              <a
+                className="btn btn-primary"
+                href={movie.trailerUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Watch trailer
+              </a>
+            ) : null}
             <Button onClick={book} disabled={!canBook}>
               Book tickets
             </Button>
@@ -142,7 +149,6 @@ export default function MovieDetails() {
             </div>
           ) : null}
         </div>
-        {trailer ? <TrailerModal movie={movie} onClose={() => setTrailer(false)} /> : null}
       </section>
 
       {/* Moctale-inspired Audience Reviews & Verdict Section */}
